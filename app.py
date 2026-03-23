@@ -4,6 +4,10 @@ import numpy as np
 import pandas as pd
 import os
 
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 app = Flask(__name__)
 
 prediction_history = []
