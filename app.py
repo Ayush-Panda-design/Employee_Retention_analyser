@@ -8,7 +8,7 @@ import os
 
 app = Flask(__name__)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 prediction_history = []
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "attrition_model_package.pkl")
@@ -102,6 +102,7 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html")
+
 
 
 @app.route("/predict", methods=["POST"])
