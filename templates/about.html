@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — RetainIQ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="nav" id="nav">
+  <a class="nav__brand" href="/">Retain<span>IQ</span></a>
+  <ul class="nav__links">
+    <li><a href="/">Predict</a></li>
+    <li><a href="/about" class="active">About</a></li>
+  </ul>
+</nav>
+
+<!-- ABOUT HERO -->
+<div class="about-hero">
+  <div class="hero__bg-grid"></div>
+  <div class="hero__glow hero__glow--tl"></div>
+  <div class="about-hero__content">
+    <div class="about-hero__eyebrow">4th Semester Python Project</div>
+    <h1>About <span>RetainIQ</span></h1>
+    <p>An end-to-end ML system for predicting employee attrition — from raw HR data to a real-time Flask web application.</p>
+  </div>
+</div>
+
+<!-- ABOUT BODY -->
+<div class="about-wrap">
+
+  <!-- OVERVIEW CARDS -->
+  <div class="about-kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-card__value">1,470</div>
+      <div class="kpi-card__label">Training Samples</div>
+      <div class="kpi-card__bar" style="--pct:73%"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">35</div>
+      <div class="kpi-card__label">Input Features</div>
+      <div class="kpi-card__bar" style="--pct:35%"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">87%</div>
+      <div class="kpi-card__label">Accuracy</div>
+      <div class="kpi-card__bar" style="--pct:87%"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">0.76</div>
+      <div class="kpi-card__label">ROC AUC Score</div>
+      <div class="kpi-card__bar" style="--pct:76%"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">16%</div>
+      <div class="kpi-card__label">Dataset Attrition Rate</div>
+      <div class="kpi-card__bar" style="--pct:16%"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__value">0.32</div>
+      <div class="kpi-card__label">Decision Threshold</div>
+      <div class="kpi-card__bar" style="--pct:32%"></div>
+    </div>
+  </div>
+
+  <!-- PIPELINE DIAGRAM -->
+  <div class="about-section">
+    <h2 class="about-section__title">ML Pipeline</h2>
+    <p class="about-section__sub">The end-to-end flow from raw HR CSV to real-time prediction.</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">📂</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">Raw Data</div>
+          <div class="pipeline-step__detail">IBM HR Dataset · 1,470 rows · 35 cols</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">🧹</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">Cleaning</div>
+          <div class="pipeline-step__detail">Drop constants · IQR outlier clipping</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">⚙️</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">Feature Eng.</div>
+          <div class="pipeline-step__detail">5 derived features · get_dummies encoding</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">⚖️</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">SMOTE</div>
+          <div class="pipeline-step__detail">Oversample minority class · fix 16% imbalance</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">🌳</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">XGBoost</div>
+          <div class="pipeline-step__detail">RandomizedSearchCV · 30 iterations · cv=3</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <div class="pipeline-step__icon">🎯</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">Threshold Tuning</div>
+          <div class="pipeline-step__detail">Best threshold = 0.32 (max F1)</div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step pipeline-step--accent">
+        <div class="pipeline-step__icon">🚀</div>
+        <div class="pipeline-step__body">
+          <div class="pipeline-step__name">Flask API</div>
+          <div class="pipeline-step__detail">Real-time /predict endpoint</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURE ENGINEERING DETAILS -->
+  <div class="about-section">
+    <h2 class="about-section__title">Feature Engineering</h2>
+    <p class="about-section__sub">5 derived features were constructed to capture richer signals beyond raw columns.</p>
+    <div class="fe-grid">
+      <div class="fe-card">
+        <div class="fe-card__formula">MonthlyIncome / (TotalWorkingYears + 1)</div>
+        <div class="fe-card__name">IncomePerExperience</div>
+        <div class="fe-card__desc">Normalises salary against career length. Low values → underpaid relative to experience → higher attrition risk.</div>
+      </div>
+      <div class="fe-card">
+        <div class="fe-card__formula">MonthlyIncome / JobLevel</div>
+        <div class="fe-card__name">IncomePerLevel</div>
+        <div class="fe-card__desc">Detects pay inequity relative to seniority. Low ratio signals misaligned compensation for job level.</div>
+      </div>
+      <div class="fe-card">
+        <div class="fe-card__formula">YearsAtCompany / (TotalWorkingYears + 1)</div>
+        <div class="fe-card__name">CompanyLoyaltyRatio</div>
+        <div class="fe-card__desc">Measures what fraction of a career was spent at this company. High ratio → loyal employee.</div>
+      </div>
+      <div class="fe-card">
+        <div class="fe-card__formula">YearsSinceLastPromotion / (YearsAtCompany + 1)</div>
+        <div class="fe-card__name">PromotionRate</div>
+        <div class="fe-card__desc">Stagnation signal. High ratio means no promotion despite long tenure — a known attrition trigger.</div>
+      </div>
+      <div class="fe-card">
+        <div class="fe-card__formula">pd.cut(YearsAtCompany, [0,2,5,10,40])</div>
+        <div class="fe-card__name">TenureGroup</div>
+        <div class="fe-card__desc">Bins tenure into 4 cohorts (0–2, 2–5, 5–10, 10+). Early cohorts show significantly higher exit rates.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL COMPARISON TABLE -->
+  <div class="about-section">
+    <h2 class="about-section__title">Model Benchmarks</h2>
+    <p class="about-section__sub">All models trained and evaluated on the same 80/20 stratified split.</p>
+    <div class="model-table-wrap">
+      <table class="model-table">
+        <thead>
+          <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>ROC AUC</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr class="winner"><td>XGBoost + SMOTE</td><td>87%</td><td>0.71</td><td>0.74</td><td>0.72</td><td>0.76</td><td><span class="badge badge--green">Selected</span></td></tr>
+          <tr><td>LightGBM + SMOTE</td><td>85%</td><td>0.68</td><td>0.71</td><td>0.69</td><td>0.74</td><td><span class="badge badge--blue">Runner-up</span></td></tr>
+          <tr><td>Random Forest</td><td>86%</td><td>0.70</td><td>0.55</td><td>0.62</td><td>0.72</td><td></td></tr>
+          <tr><td>Gradient Boosting</td><td>85%</td><td>0.67</td><td>0.52</td><td>0.59</td><td>0.71</td><td></td></tr>
+          <tr><td>Logistic Regression</td><td>83%</td><td>0.58</td><td>0.48</td><td>0.53</td><td>0.68</td><td></td></tr>
+          <tr><td>SVM</td><td>82%</td><td>0.55</td><td>0.50</td><td>0.52</td><td>0.67</td><td></td></tr>
+          <tr><td>K-Nearest Neighbors</td><td>80%</td><td>0.50</td><td>0.42</td><td>0.46</td><td>0.63</td><td></td></tr>
+          <tr><td>Naive Bayes</td><td>77%</td><td>0.44</td><td>0.55</td><td>0.49</td><td>0.65</td><td></td></tr>
+          <tr class="baseline"><td>Dummy (Most Frequent)</td><td>84%</td><td>—</td><td>0.00</td><td>0.00</td><td>0.50</td><td><span class="badge">Baseline</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="about-section__note">XGBoost was selected primarily for <strong>Recall</strong> and <strong>F1</strong> — in HR attrition, catching at-risk employees (recall) is more valuable than precision. The threshold was lowered to 0.32 to further boost recall.</p>
+  </div>
+
+  <!-- TOP ATTRITION DRIVERS -->
+  <div class="about-section">
+    <h2 class="about-section__title">Top Attrition Drivers</h2>
+    <p class="about-section__sub">Key findings from exploratory data analysis on the IBM HR dataset.</p>
+    <div class="drivers-grid">
+      <div class="driver-card driver-card--high">
+        <div class="driver-card__rank">01</div>
+        <div class="driver-card__name">Overtime</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:91%"></div></div>
+        <div class="driver-card__note">Employees working overtime are 3× more likely to leave</div>
+      </div>
+      <div class="driver-card driver-card--high">
+        <div class="driver-card__rank">02</div>
+        <div class="driver-card__name">Low Monthly Income</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:84%"></div></div>
+        <div class="driver-card__note">Below-average compensation is the strongest continuous predictor</div>
+      </div>
+      <div class="driver-card driver-card--high">
+        <div class="driver-card__rank">03</div>
+        <div class="driver-card__name">Younger Age (18–30)</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:78%"></div></div>
+        <div class="driver-card__note">Younger employees leave more frequently, especially in first 2 years</div>
+      </div>
+      <div class="driver-card driver-card--med">
+        <div class="driver-card__rank">04</div>
+        <div class="driver-card__name">Research &amp; Development Dept</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:65%"></div></div>
+        <div class="driver-card__note">Highest departmental churn rate despite competitive salaries</div>
+      </div>
+      <div class="driver-card driver-card--med">
+        <div class="driver-card__rank">05</div>
+        <div class="driver-card__name">Frequent Business Travel</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:60%"></div></div>
+        <div class="driver-card__note">Correlates with poor work-life balance and higher attrition</div>
+      </div>
+      <div class="driver-card driver-card--med">
+        <div class="driver-card__rank">06</div>
+        <div class="driver-card__name">Low Job Satisfaction</div>
+        <div class="driver-card__bar"><div class="driver-card__fill" style="width:56%"></div></div>
+        <div class="driver-card__note">Rating of 1 or 2 doubles the probability of leaving</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="about-section">
+    <h2 class="about-section__title">Tech Stack</h2>
+    <div class="tech-stack-grid">
+      <div class="tech-layer">
+        <div class="tech-layer__label">Data & ML</div>
+        <div class="tech-layer__pills">
+          <span class="tech-pill">Python 3.10+</span>
+          <span class="tech-pill">Pandas</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">scikit-learn</span>
+          <span class="tech-pill">XGBoost</span>
+          <span class="tech-pill">LightGBM</span>
+          <span class="tech-pill">imbalanced-learn</span>
+          <span class="tech-pill">Joblib</span>
+          <span class="tech-pill">Matplotlib</span>
+          <span class="tech-pill">Seaborn</span>
+        </div>
+      </div>
+      <div class="tech-layer">
+        <div class="tech-layer__label">Backend</div>
+        <div class="tech-layer__pills">
+          <span class="tech-pill tech-pill--accent">Flask</span>
+          <span class="tech-pill">Jinja2</span>
+        </div>
+      </div>
+      <div class="tech-layer">
+        <div class="tech-layer__label">Frontend</div>
+        <div class="tech-layer__pills">
+          <span class="tech-pill">HTML5</span>
+          <span class="tech-pill">CSS3</span>
+          <span class="tech-pill">Vanilla JS</span>
+          <span class="tech-pill">Google Fonts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="about-cta">
+    <h2>Ready to run a prediction?</h2>
+    <p>Enter an employee profile and get an attrition probability score in under a second.</p>
+    <a href="/" class="btn btn--primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Go to Predictor
+    </a>
+  </div>
+
+</div><!-- /about-wrap -->
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">Retain<span>IQ</span></div>
+    <p>4th Semester Python Project &nbsp;·&nbsp; Flask + XGBoost + IBM HR Data</p>
+    <a href="https://github.com/sritams1505/4th_sem_python_project" target="_blank" rel="noopener" class="footer__gh">GitHub ↗</a>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

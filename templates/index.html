@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RetainIQ — Employee Attrition Predictor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ░░ CURSOR GLOW ░░ -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ░░ NAV ░░ -->
+<nav class="nav" id="nav">
+  <a class="nav__brand" href="/">Retain<span>IQ</span></a>
+  <ul class="nav__links">
+    <li><a href="/" class="active">Predict</a></li>
+    <li><a href="/about">About</a></li>
+    <li>
+      <button class="nav__history-btn" id="historyToggle" title="View session history">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+        <span class="nav__history-count" id="historyCount" style="display:none">0</span>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<!-- ░░ HISTORY DRAWER ░░ -->
+<div class="history-drawer" id="historyDrawer">
+  <div class="history-drawer__inner">
+    <div class="history-drawer__head">
+      <h3>Session History</h3>
+      <button class="history-drawer__clear" id="clearHistory">Clear</button>
+      <button class="history-drawer__close" id="closeHistory">✕</button>
+    </div>
+    <div class="history-drawer__body" id="historyBody">
+      <p class="history-drawer__empty">No predictions yet.</p>
+    </div>
+  </div>
+</div>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+<!-- ░░ HERO ░░ -->
+<header class="hero">
+  <div class="hero__bg-grid"></div>
+  <div class="hero__glow hero__glow--tl"></div>
+  <div class="hero__glow hero__glow--br"></div>
+
+  <div class="hero__content">
+    <div class="hero__pill">
+      <span class="hero__pill-dot"></span>
+      ML-Powered · XGBoost · IBM HR Dataset
+    </div>
+    <h1 class="hero__title">
+      Predict Employee<br/>
+      <span class="hero__title-accent">Retention Risk</span>
+    </h1>
+    <p class="hero__sub">Enter an employee profile below. The model computes attrition probability, identifies risk factors, and advises on retention strategy — all in under a second.</p>
+    <div class="hero__stats">
+      <div class="hero__stat"><span>87%</span><small>Accuracy</small></div>
+      <div class="hero__stat-div"></div>
+      <div class="hero__stat"><span>1,470</span><small>Training Rows</small></div>
+      <div class="hero__stat-div"></div>
+      <div class="hero__stat"><span>0.32</span><small>Threshold</small></div>
+      <div class="hero__stat-div"></div>
+      <div class="hero__stat"><span>XGB</span><small>Algorithm</small></div>
+    </div>
+    <a href="#predict-section" class="hero__cta">
+      Start Analysis
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </a>
+  </div>
+
+  <!-- floating data ticker -->
+  <div class="hero__ticker" aria-hidden="true">
+    <div class="hero__ticker-track">
+      <span>Attrition Rate ↑ 16%</span><span class="sep">·</span>
+      <span>Avg Tenure 5.2 yrs</span><span class="sep">·</span>
+      <span>Top Risk: Overtime</span><span class="sep">·</span>
+      <span>R&D Dept Highest Churn</span><span class="sep">·</span>
+      <span>Low Income → 2× Risk</span><span class="sep">·</span>
+      <span>Attrition Rate ↑ 16%</span><span class="sep">·</span>
+      <span>Avg Tenure 5.2 yrs</span><span class="sep">·</span>
+      <span>Top Risk: Overtime</span><span class="sep">·</span>
+      <span>R&D Dept Highest Churn</span><span class="sep">·</span>
+      <span>Low Income → 2× Risk</span><span class="sep">·</span>
+    </div>
+  </div>
+</header>
+
+<!-- ░░ MAIN PREDICT SECTION ░░ -->
+<main id="predict-section">
+  <div class="layout">
+
+    <!-- LEFT: FORM -->
+    <div class="form-col">
+      <div class="card" id="formCard">
+
+        <!-- Progress steps -->
+        <div class="steps">
+          <div class="step active" data-step="1"><span>1</span> Personal</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2"><span>2</span> Job</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3"><span>3</span> Pay</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="4"><span>4</span> Wellbeing</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="5"><span>5</span> Tenure</div>
+        </div>
+
+        <form id="predict-form" novalidate>
+
+          <!-- ── PAGE 1: Personal ── -->
+          <div class="form-page active" data-page="1">
+            <div class="form-page__header">
+              <div class="form-page__num">01 / 05</div>
+              <h2>Personal Details</h2>
+              <p>Basic demographic information about the employee.</p>
+            </div>
+            <div class="form-page__fields">
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="EmployeeName">Employee Name <span class="opt">(optional)</span></label>
+                  <input type="text" id="EmployeeName" name="EmployeeName" placeholder="e.g. Ravi Sharma"/>
+                </div>
+                <div class="field">
+                  <label for="Age">Age <span class="req">*</span></label>
+                  <div class="input-wrap">
+                    <input type="number" id="Age" name="Age" min="18" max="60" value="32" required/>
+                    <span class="input-unit">yrs</span>
+                  </div>
+                  <div class="field-range"><span>18</span><span>60</span></div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="Gender">Gender</label>
+                  <div class="select-wrap">
+                    <select id="Gender" name="Gender">
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="MaritalStatus">Marital Status</label>
+                  <div class="select-wrap">
+                    <select id="MaritalStatus" name="MaritalStatus">
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                      <option value="Divorced">Divorced</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="Education">Education Level <span class="req">*</span>
+                    <span class="tooltip" data-tip="1=Below College · 2=College · 3=Bachelor · 4=Master · 5=Doctor">?</span>
+                  </label>
+                  <div class="rating-buttons" id="educationRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                    <button type="button" class="rating-btn" data-val="5">5</button>
+                  </div>
+                  <input type="hidden" id="Education" name="Education" value="3"/>
+                  <div class="rating-labels"><span>Below College</span><span>Doctor</span></div>
+                </div>
+                <div class="field">
+                  <label for="EducationField">Education Field</label>
+                  <div class="select-wrap">
+                    <select id="EducationField" name="EducationField">
+                      <option value="Life Sciences">Life Sciences</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="Technical Degree">Technical Degree</option>
+                      <option value="Human Resources">Human Resources</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="DistanceFromHome">Distance From Home
+                  <span class="tooltip" data-tip="Miles from home to workplace">?</span>
+                </label>
+                <div class="slider-wrap">
+                  <input type="range" id="DistanceFromHome" name="DistanceFromHome" min="1" max="29" value="5" class="slider"/>
+                  <div class="slider-value" id="distVal">5 mi</div>
+                </div>
+                <div class="field-range"><span>1 mi</span><span>29 mi</span></div>
+              </div>
+
+            </div>
+            <div class="form-page__nav">
+              <div></div>
+              <button type="button" class="btn btn--next" data-next="2">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+
+          <!-- ── PAGE 2: Job ── -->
+          <div class="form-page" data-page="2">
+            <div class="form-page__header">
+              <div class="form-page__num">02 / 05</div>
+              <h2>Job Details</h2>
+              <p>Current role, department, and work conditions.</p>
+            </div>
+            <div class="form-page__fields">
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="Department">Department</label>
+                  <div class="select-wrap">
+                    <select id="Department" name="Department">
+                      <option value="Sales">Sales</option>
+                      <option value="Research &amp; Development">Research &amp; Development</option>
+                      <option value="Human Resources">Human Resources</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="JobRole">Job Role</label>
+                  <div class="select-wrap">
+                    <select id="JobRole" name="JobRole">
+                      <option value="Sales Executive">Sales Executive</option>
+                      <option value="Research Scientist">Research Scientist</option>
+                      <option value="Laboratory Technician">Laboratory Technician</option>
+                      <option value="Manufacturing Director">Manufacturing Director</option>
+                      <option value="Healthcare Representative">Healthcare Representative</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Sales Representative">Sales Representative</option>
+                      <option value="Research Director">Research Director</option>
+                      <option value="Human Resources">Human Resources</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="JobLevel">Job Level
+                    <span class="tooltip" data-tip="1=Entry · 2=Junior · 3=Mid · 4=Senior · 5=Director">?</span>
+                  </label>
+                  <div class="rating-buttons" id="jobLevelRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn active" data-val="2">2</button>
+                    <button type="button" class="rating-btn" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                    <button type="button" class="rating-btn" data-val="5">5</button>
+                  </div>
+                  <input type="hidden" id="JobLevel" name="JobLevel" value="2"/>
+                  <div class="rating-labels"><span>Entry</span><span>Director</span></div>
+                </div>
+                <div class="field">
+                  <label for="JobInvolvement">Job Involvement
+                    <span class="tooltip" data-tip="1=Low · 2=Medium · 3=High · 4=Very High">?</span>
+                  </label>
+                  <div class="rating-buttons" id="jobInvRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="JobInvolvement" name="JobInvolvement" value="3"/>
+                  <div class="rating-labels"><span>Low</span><span>Very High</span></div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="BusinessTravel">Business Travel</label>
+                  <div class="toggle-group" id="travelGroup">
+                    <button type="button" class="toggle-btn active" data-val="Travel_Rarely">Rarely</button>
+                    <button type="button" class="toggle-btn" data-val="Travel_Frequently">Frequently</button>
+                    <button type="button" class="toggle-btn" data-val="Non-Travel">None</button>
+                  </div>
+                  <input type="hidden" id="BusinessTravel" name="BusinessTravel" value="Travel_Rarely"/>
+                </div>
+                <div class="field">
+                  <label>Overtime</label>
+                  <div class="toggle-group" id="overtimeGroup">
+                    <button type="button" class="toggle-btn active" data-val="No">No</button>
+                    <button type="button" class="toggle-btn" data-val="Yes">Yes</button>
+                  </div>
+                  <input type="hidden" id="OverTime" name="OverTime" value="No"/>
+                </div>
+              </div>
+
+            </div>
+            <div class="form-page__nav">
+              <button type="button" class="btn btn--ghost" data-prev="1">← Back</button>
+              <button type="button" class="btn btn--next" data-next="3">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+
+          <!-- ── PAGE 3: Compensation ── -->
+          <div class="form-page" data-page="3">
+            <div class="form-page__header">
+              <div class="form-page__num">03 / 05</div>
+              <h2>Compensation</h2>
+              <p>Salary, rates, and equity information.</p>
+            </div>
+            <div class="form-page__fields">
+
+              <div class="field">
+                <label for="MonthlyIncome">Monthly Income <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <span class="input-prefix">$</span>
+                  <input type="number" id="MonthlyIncome" name="MonthlyIncome" min="1009" max="19999" value="5000" required/>
+                </div>
+                <div class="field-hint">Range: $1,009 – $19,999</div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="DailyRate">Daily Rate</label>
+                  <div class="input-wrap">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="DailyRate" name="DailyRate" min="102" max="1499" value="800"/>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="HourlyRate">Hourly Rate</label>
+                  <div class="input-wrap">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="HourlyRate" name="HourlyRate" min="30" max="100" value="65"/>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="MonthlyRate">Monthly Rate</label>
+                  <div class="input-wrap">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="MonthlyRate" name="MonthlyRate" min="2094" max="26999" value="14000"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="PercentSalaryHike">% Salary Hike Last Year</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="PercentSalaryHike" name="PercentSalaryHike" min="11" max="25" value="15" class="slider"/>
+                    <div class="slider-value" id="hikeVal">15%</div>
+                  </div>
+                  <div class="field-range"><span>11%</span><span>25%</span></div>
+                </div>
+                <div class="field">
+                  <label for="StockOptionLevel">Stock Option Level
+                    <span class="tooltip" data-tip="0=None · 1=Low · 2=Medium · 3=High">?</span>
+                  </label>
+                  <div class="rating-buttons" id="stockRating">
+                    <button type="button" class="rating-btn active" data-val="0">0</button>
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn" data-val="3">3</button>
+                  </div>
+                  <input type="hidden" id="StockOptionLevel" name="StockOptionLevel" value="0"/>
+                  <div class="rating-labels"><span>None</span><span>High</span></div>
+                </div>
+              </div>
+
+            </div>
+            <div class="form-page__nav">
+              <button type="button" class="btn btn--ghost" data-prev="2">← Back</button>
+              <button type="button" class="btn btn--next" data-next="4">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+
+          <!-- ── PAGE 4: Satisfaction ── -->
+          <div class="form-page" data-page="4">
+            <div class="form-page__header">
+              <div class="form-page__num">04 / 05</div>
+              <h2>Satisfaction & Performance</h2>
+              <p>Rate each dimension 1 (Low) → 4 (Very High).</p>
+            </div>
+            <div class="form-page__fields">
+
+              <div class="sat-grid">
+                <div class="sat-card">
+                  <div class="sat-card__label">Job Satisfaction</div>
+                  <div class="rating-buttons" id="jobSatRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="JobSatisfaction" name="JobSatisfaction" value="3"/>
+                  <div class="sat-card__scale"><span>Low</span><span>Very High</span></div>
+                </div>
+                <div class="sat-card">
+                  <div class="sat-card__label">Environment Satisfaction</div>
+                  <div class="rating-buttons" id="envSatRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="EnvironmentSatisfaction" name="EnvironmentSatisfaction" value="3"/>
+                  <div class="sat-card__scale"><span>Low</span><span>Very High</span></div>
+                </div>
+                <div class="sat-card">
+                  <div class="sat-card__label">Relationship Satisfaction</div>
+                  <div class="rating-buttons" id="relSatRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="RelationshipSatisfaction" name="RelationshipSatisfaction" value="3"/>
+                  <div class="sat-card__scale"><span>Low</span><span>Very High</span></div>
+                </div>
+                <div class="sat-card">
+                  <div class="sat-card__label">Work-Life Balance</div>
+                  <div class="rating-buttons" id="wlbRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="WorkLifeBalance" name="WorkLifeBalance" value="3"/>
+                  <div class="sat-card__scale"><span>Bad</span><span>Best</span></div>
+                </div>
+                <div class="sat-card">
+                  <div class="sat-card__label">Performance Rating</div>
+                  <div class="rating-buttons" id="perfRating">
+                    <button type="button" class="rating-btn" data-val="1">1</button>
+                    <button type="button" class="rating-btn" data-val="2">2</button>
+                    <button type="button" class="rating-btn active" data-val="3">3</button>
+                    <button type="button" class="rating-btn" data-val="4">4</button>
+                  </div>
+                  <input type="hidden" id="PerformanceRating" name="PerformanceRating" value="3"/>
+                  <div class="sat-card__scale"><span>Low</span><span>Outstanding</span></div>
+                </div>
+                <div class="sat-card">
+                  <div class="sat-card__label">Trainings Last Year</div>
+                  <div class="slider-wrap" style="margin-top:.5rem">
+                    <input type="range" id="TrainingTimesLastYear" name="TrainingTimesLastYear" min="0" max="6" value="3" class="slider"/>
+                    <div class="slider-value" id="trainVal">3</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>6</span></div>
+                </div>
+              </div>
+
+            </div>
+            <div class="form-page__nav">
+              <button type="button" class="btn btn--ghost" data-prev="3">← Back</button>
+              <button type="button" class="btn btn--next" data-next="5">Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+
+          <!-- ── PAGE 5: Tenure ── -->
+          <div class="form-page" data-page="5">
+            <div class="form-page__header">
+              <div class="form-page__num">05 / 05</div>
+              <h2>Experience & Tenure</h2>
+              <p>Career history and time at company.</p>
+            </div>
+            <div class="form-page__fields">
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="TotalWorkingYears">Total Working Years</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="TotalWorkingYears" name="TotalWorkingYears" min="0" max="40" value="8" class="slider"/>
+                    <div class="slider-value" id="twYearsVal">8</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>40</span></div>
+                </div>
+                <div class="field">
+                  <label for="NumCompaniesWorked">No. of Companies Worked</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="NumCompaniesWorked" name="NumCompaniesWorked" min="0" max="9" value="2" class="slider"/>
+                    <div class="slider-value" id="numCoVal">2</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>9</span></div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="YearsAtCompany">Years at Company</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="YearsAtCompany" name="YearsAtCompany" min="0" max="40" value="5" class="slider"/>
+                    <div class="slider-value" id="yacVal">5</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>40</span></div>
+                </div>
+                <div class="field">
+                  <label for="YearsInCurrentRole">Years in Current Role</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="YearsInCurrentRole" name="YearsInCurrentRole" min="0" max="18" value="3" class="slider"/>
+                    <div class="slider-value" id="yicrVal">3</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>18</span></div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="YearsSinceLastPromotion">Years Since Last Promotion</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="YearsSinceLastPromotion" name="YearsSinceLastPromotion" min="0" max="15" value="1" class="slider"/>
+                    <div class="slider-value" id="yslpVal">1</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>15</span></div>
+                </div>
+                <div class="field">
+                  <label for="YearsWithCurrManager">Years With Current Manager</label>
+                  <div class="slider-wrap">
+                    <input type="range" id="YearsWithCurrManager" name="YearsWithCurrManager" min="0" max="17" value="3" class="slider"/>
+                    <div class="slider-value" id="ywcmVal">3</div>
+                  </div>
+                  <div class="field-range"><span>0</span><span>17</span></div>
+                </div>
+              </div>
+
+            </div>
+            <div class="form-page__nav">
+              <button type="button" class="btn btn--ghost" data-prev="4">← Back</button>
+              <button type="submit" class="btn btn--primary" id="submitBtn">
+                <span class="btn__text">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  Run Prediction
+                </span>
+                <span class="btn__loader"></span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULT PANEL -->
+    <div class="result-col">
+      <!-- Placeholder state -->
+      <div class="result-placeholder" id="resultPlaceholder">
+        <div class="result-placeholder__icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h3>Awaiting Prediction</h3>
+        <p>Complete the employee profile on the left and click "Run Prediction" to see the attrition analysis here.</p>
+        <div class="result-placeholder__features">
+          <div class="rpf"><span>📊</span> Probability Score</div>
+          <div class="rpf"><span>⚠️</span> Risk Factor Analysis</div>
+          <div class="rpf"><span>💡</span> Retention Advice</div>
+          <div class="rpf"><span>📈</span> Session History</div>
+        </div>
+      </div>
+
+      <!-- Result panel (hidden until prediction) -->
+      <div class="result-panel" id="resultPanel" style="display:none">
+
+        <!-- Top: Gauge + Verdict -->
+        <div class="result-panel__top">
+          <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+              <!-- BG arc -->
+              <path class="gauge-track" d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round"/>
+              <!-- Colored fill -->
+              <path class="gauge-value" id="gaugePath" d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke-width="14" stroke-linecap="round" pathLength="1"/>
+              <!-- Needle dot -->
+              <circle class="gauge-dot" id="gaugeDot" cx="100" cy="110" r="6"/>
+              <!-- Center text -->
+              <text class="gauge-pct" id="gaugePct" x="100" y="95" text-anchor="middle">0%</text>
+              <text class="gauge-sub" x="100" y="115" text-anchor="middle">Attrition Risk</text>
+            </svg>
+          </div>
+
+          <div class="verdict" id="verdictBox">
+            <div class="verdict__badge" id="verdictBadge"></div>
+            <div class="verdict__title" id="verdictTitle"></div>
+            <div class="verdict__sub" id="verdictSub"></div>
+          </div>
+        </div>
+
+        <!-- Probability bar -->
+        <div class="prob-bar-wrap">
+          <div class="prob-bar-labels">
+            <span>Low Risk</span><span>Medium</span><span>High Risk</span>
+          </div>
+          <div class="prob-bar-track">
+            <div class="prob-bar-zones">
+              <div class="zone zone--low"></div>
+              <div class="zone zone--mid"></div>
+              <div class="zone zone--high"></div>
+            </div>
+            <div class="prob-bar-needle" id="probNeedle"></div>
+          </div>
+          <div class="prob-bar-threshold">
+            <div class="threshold-line" id="thresholdLine"></div>
+            <span class="threshold-label">Decision Threshold</span>
+          </div>
+        </div>
+
+        <!-- Risk Factors -->
+        <div class="factors-section">
+          <h4 class="factors-section__title">Risk Factor Analysis</h4>
+          <div class="factors-list" id="factorsList"></div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="rec-box" id="recBox">
+          <div class="rec-box__icon" id="recIcon"></div>
+          <div class="rec-box__text">
+            <div class="rec-box__label">Recommendation</div>
+            <div class="rec-box__body" id="recBody"></div>
+          </div>
+        </div>
+
+        <p class="result-disclaimer">Model estimates only. Combine with direct manager input and HR judgement.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ░░ FOOTER ░░ -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">Retain<span>IQ</span></div>
+    <p>4th Semester Python Project &nbsp;·&nbsp; Flask + XGBoost + IBM HR Data</p>
+    <a href="https://github.com/sritams1505/4th_sem_python_project" target="_blank" rel="noopener" class="footer__gh">GitHub ↗</a>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
