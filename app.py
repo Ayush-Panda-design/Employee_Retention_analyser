@@ -5,11 +5,10 @@ import pandas as pd
 import os
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 app = Flask(__name__)
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 prediction_history = []
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "attrition_model_package.pkl")
